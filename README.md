@@ -1,19 +1,66 @@
-# YouTube Strict Cleaner (Chrome/Brave Extension)
+# Nuke Shorts
 
-This extension enforces two behaviors on YouTube:
+A Chrome/Brave extension that blocks YouTube Shorts and watch-page recommendations, with a PIN-protected popup UI so the settings can't be casually undone.
 
-1. Strictly blocks/hides Shorts content and redirects away from Shorts pages.
-2. Hides recommended videos on watch/play screens.
+## Features
+
+- **Block Shorts** — hides all Shorts thumbnails, shelf sections, sidebar links, and redirects away from `/shorts/` URLs
+- **Block Recommendations** — hides the watch-page sidebar, end-screen suggestions, and autoplay overlays
+- **Popup UI** — click the extension icon to toggle each feature on or off
+- **PIN protection** — turning a feature *off* requires a 4-digit PIN; turning it back *on* is always free
+- **Change PIN** — update your PIN at any time from the popup (requires the current PIN first)
+- **Live updates** — changes in the popup take effect on any open YouTube tab instantly, no refresh needed
 
 ## Install (Developer Mode)
 
 1. Open `chrome://extensions` (or `brave://extensions`).
-2. Turn on **Developer mode**.
+2. Enable **Developer mode** (top-right toggle).
 3. Click **Load unpacked**.
-4. Select this folder: `shortsblock`.
+4. Select the `shortsblock` folder.
 
-## Notes
+## How to Use
 
-- Works on `https://www.youtube.com/*`.
-- Uses both CSS and JavaScript DOM enforcement so hidden elements do not come back after dynamic page updates.
-- If YouTube changes internal DOM names in the future, selectors may need an update.
+### Toggles
+
+Open the popup by clicking the extension icon in the toolbar. Two toggle switches are shown:
+
+| Toggle | What it blocks |
+|---|---|
+| Block Shorts | Shorts thumbnails, shelves, nav links, `/shorts/` redirects |
+| Block Recommendations | Watch-page sidebar, end-screen cards, autoplay overlays |
+
+Both are **on by default**.
+
+### PIN setup
+
+Turning a toggle **off** for the first time will prompt you to create a 4-digit PIN before the change is applied. After a PIN is set:
+
+- **Turning off** either feature → enter your PIN on the numpad
+- **Turning on** either feature → no PIN needed
+- **Changing your PIN** → click *Change PIN*, verify your current PIN, then enter and confirm the new one
+
+The PIN is never stored in plain text — it is hashed with **SHA-256** (Web Crypto API) before being saved to `chrome.storage.local`.
+
+## File Structure
+
+```
+shortsblock/
+├── manifest.json      # Extension manifest (MV3)
+├── content.js         # Injected into YouTube; manages blocking CSS + DOM enforcement
+├── popup.html         # Popup UI markup
+├── popup.css          # Popup styles (shadcn-style dark, black & white)
+├── popup.js           # Popup logic: toggles, PIN state machine, storage sync
+└── icon*.png          # Extension icons (16, 32, 48, 128 px)
+```
+
+## Technical Notes
+
+- **Dynamic CSS injection** — `content.js` creates a `<style>` element synchronously at `document_start` and updates its content based on stored settings. This means blocking is active before any page content paints, with no flash of unblocked content.
+- **SPA navigation** — a `MutationObserver` watches for DOM changes and re-enforces rules after YouTube's client-side navigation.
+- **Periodic sweep** — a `setInterval` runs every 1.5 s as a safety net for lazily-loaded content.
+- **Storage** — settings (`shortsBlocked`, `recsBlocked`, `pinHash`) are persisted in `chrome.storage.local`. The content script listens via `chrome.storage.onChanged` for instant cross-tab updates.
+- **Permissions used** — `storage`, `host_permissions: https://www.youtube.com/*`
+
+## Caveats
+
+YouTube periodically changes its internal component names. If blocking stops working, the CSS selectors and custom-element names in `content.js` may need updating.
