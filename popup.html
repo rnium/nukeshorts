@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Nuke Shorts</title>
+        <link rel="stylesheet" href="popup.css" />
+    </head>
+    <body>
+        <div class="app">
+            <!-- ── Header (always visible) ── -->
+            <header class="header">
+                <span class="header-title">Nuke Shorts</span>
+            </header>
+
+            <!-- ── Main view ── -->
+            <div class="view" id="main-view">
+                <div class="feature-row">
+                    <div class="feature-text">
+                        <div class="feature-name">Block Shorts</div>
+                        <div class="feature-desc">
+                            Hide all YouTube Shorts &amp; redirects
+                        </div>
+                    </div>
+                    <label class="toggle" aria-label="Toggle Block Shorts">
+                        <input type="checkbox" id="shorts-toggle" />
+                        <span class="toggle-track">
+                            <span class="toggle-thumb"></span>
+                        </span>
+                    </label>
+                </div>
+
+                <div class="row-divider"></div>
+
+                <div class="feature-row">
+                    <div class="feature-text">
+                        <div class="feature-name">Block Recommendations</div>
+                        <div class="feature-desc">
+                            Hide sidebar &amp; end-screen suggestions
+                        </div>
+                    </div>
+                    <label
+                        class="toggle"
+                        aria-label="Toggle Block Recommendations"
+                    >
+                        <input type="checkbox" id="recs-toggle" />
+                        <span class="toggle-track">
+                            <span class="toggle-thumb"></span>
+                        </span>
+                    </label>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <div class="pin-row">
+                    <div class="pin-status-text">
+                        <div class="pin-status-label" id="pin-status-label">
+                            No PIN set
+                        </div>
+                        <div class="pin-status-desc" id="pin-status-desc">
+                            Set a PIN to lock your settings
+                        </div>
+                    </div>
+                    <button class="outline-btn" id="pin-action-btn">
+                        Set PIN
+                    </button>
+                </div>
+            </div>
+            <!-- #main-view -->
+
+            <!-- ── PIN entry view (swaps in place of main) ── -->
+            <div class="view hidden" id="pin-view">
+                <div class="pin-view-header">
+                    <div class="modal-title" id="modal-title">Enter PIN</div>
+                    <div class="modal-desc" id="modal-desc">
+                        Enter your 4-digit PIN
+                    </div>
+                </div>
+
+                <div
+                    class="pin-dots"
+                    id="pin-dots"
+                    aria-label="PIN entry progress"
+                >
+                    <span class="dot" id="d0"></span>
+                    <span class="dot" id="d1"></span>
+                    <span class="dot" id="d2"></span>
+                    <span class="dot" id="d3"></span>
+                </div>
+
+                <div class="pin-error hidden" id="pin-error" role="alert"></div>
+
+                <div class="numpad" role="group" aria-label="PIN numpad">
+                    <button class="num-btn" data-digit="1">1</button>
+                    <button class="num-btn" data-digit="2">2</button>
+                    <button class="num-btn" data-digit="3">3</button>
+                    <button class="num-btn" data-digit="4">4</button>
+                    <button class="num-btn" data-digit="5">5</button>
+                    <button class="num-btn" data-digit="6">6</button>
+                    <button class="num-btn" data-digit="7">7</button>
+                    <button class="num-btn" data-digit="8">8</button>
+                    <button class="num-btn" data-digit="9">9</button>
+                    <div class="num-spacer"></div>
+                    <button class="num-btn" data-digit="0">0</button>
+                    <button
+                        class="num-btn num-back"
+                        id="backspace"
+                        aria-label="Backspace"
+                    >
+                        ⌫
+                    </button>
+                </div>
+
+                <button class="cancel-btn" id="modal-close">Cancel</button>
+            </div>
+            <!-- #pin-view -->
+        </div>
+        <!-- .app -->
+
+        <script src="popup.js"></script>
+    </body>
+</html>

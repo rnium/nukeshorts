@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Nuke Shorts",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Strictly hides YouTube Shorts and watch-page recommended videos.",
   "icons": {
     "16": "icon16.png",
@@ -9,8 +9,10 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
+  "permissions": ["storage"],
   "action": {
     "default_title": "Nuke Shorts",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icon16.png",
       "32": "icon32.png"
@@ -18,19 +20,10 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "https://www.youtube.com/*"
-      ],
-      "js": [
-        "content.js"
-      ],
-      "css": [
-        "styles.css"
-      ],
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content.js"],
       "run_at": "document_start"
     }
   ],
-  "host_permissions": [
-    "https://www.youtube.com/*"
-  ]
+  "host_permissions": ["https://www.youtube.com/*"]
 }
