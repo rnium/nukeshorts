@@ -6,6 +6,7 @@
 const MODE = {
   VERIFY_DISABLE_SHORTS: "verify-disable-shorts",
   VERIFY_DISABLE_RECS: "verify-disable-recs",
+  VERIFY_DISABLE_YT: "verify-disable-yt",
   VERIFY_CHANGE_PIN: "verify-change-pin",
   SET_NEW_PIN: "set-new-pin",
   CONFIRM_NEW_PIN: "confirm-new-pin",
@@ -15,6 +16,7 @@ const MODE = {
    Runtime state
 ───────────────────────────────────────────── */
 const state = {
+  ytBlocked: false,
   shortsBlocked: true,
   recsBlocked: true,
   pinHash: null, // SHA-256 hex string, or null if no PIN set
@@ -22,8 +24,8 @@ const state = {
 
 let modalMode = null; // current MODE value
 let pinBuffer = ""; // digits typed so far (max 4)
-let newPinBuffer = ""; // new PIN stored between SET_NEW_PIN → CONFIRM_NEW_PIN
-let pendingDisable = null; // 'shorts' | 'recs' | null – feature to disable after PIN setup
+let newPinBuffer = ""; // new PIN stored between SET_NEW_PIN -> CONFIRM_NEW_PIN
+let pendingDisable = null; // 'yt' | 'shorts' | 'recs' | null
 
 /* ─────────────────────────────────────────────
    Crypto
@@ -44,8 +46,9 @@ async function sha256(text) {
 function loadState() {
   return new Promise((resolve) =>
     chrome.storage.local.get(
-      ["shortsBlocked", "recsBlocked", "pinHash"],
+      ["ytBlocked", "shortsBlocked", "recsBlocked", "pinHash"],
       (res) => {
+        state.ytBlocked = res.ytBlocked === true; // default false
         state.shortsBlocked = res.shortsBlocked !== false; // default true
         state.recsBlocked = res.recsBlocked !== false; // default true
         state.pinHash = res.pinHash ?? null;
@@ -57,6 +60,7 @@ function loadState() {
 
 function persist() {
   chrome.storage.local.set({
+    ytBlocked: state.ytBlocked,
     shortsBlocked: state.shortsBlocked,
     recsBlocked: state.recsBlocked,
     pinHash: state.pinHash,
@@ -68,6 +72,7 @@ function persist() {
 ───────────────────────────────────────────── */
 function renderMain() {
   // Toggles
+  document.getElementById("yt-toggle").checked = state.ytBlocked;
   document.getElementById("shorts-toggle").checked = state.shortsBlocked;
   document.getElementById("recs-toggle").checked = state.recsBlocked;
 
@@ -129,14 +134,12 @@ function flashDots(errorMsg) {
   }
 
   dotsEl.classList.remove("shake");
-  // Force reflow so the animation re-triggers
   void dotsEl.offsetWidth;
   dotsEl.classList.add("shake");
 
   showError(errorMsg);
   pinBuffer = "";
 
-  // Clear after shake settles
   setTimeout(() => {
     dotsEl.classList.remove("shake");
     for (let i = 0; i < 4; i++) {
@@ -169,7 +172,6 @@ function pressDigit(digit) {
   pinBuffer += digit;
   refreshDots();
   if (pinBuffer.length === 4) {
-    // Small delay so the last dot fills visibly before processing
     setTimeout(handleComplete, 120);
   }
 }
@@ -216,6 +218,20 @@ async function handleComplete() {
     return;
   }
 
+  /* ── Verify to disable YouTube nuke ── */
+  if (mode === MODE.VERIFY_DISABLE_YT) {
+    const hash = await sha256(entered);
+    if (hash === state.pinHash) {
+      state.ytBlocked = false;
+      persist();
+      renderMain();
+      closeModal();
+    } else {
+      flashDots("Incorrect PIN. Try again.");
+    }
+    return;
+  }
+
   /* ── Verify current PIN before changing ── */
   if (mode === MODE.VERIFY_CHANGE_PIN) {
     const hash = await sha256(entered);
@@ -244,6 +260,7 @@ async function handleComplete() {
       state.pinHash = await sha256(entered);
 
       // Execute any pending disable action that triggered the setup flow
+      if (pendingDisable === "yt") state.ytBlocked = false;
       if (pendingDisable === "shorts") state.shortsBlocked = false;
       if (pendingDisable === "recs") state.recsBlocked = false;
 
@@ -253,7 +270,6 @@ async function handleComplete() {
     } else {
       newPinBuffer = "";
       flashDots("PINs don't match.");
-      // After the error animation, restart from step 1
       setTimeout(() => {
         openModal(
           MODE.SET_NEW_PIN,
@@ -269,12 +285,21 @@ async function handleComplete() {
 /* ─────────────────────────────────────────────
    Toggle "turn off" flow
 ───────────────────────────────────────────── */
-function handleTurnOff(feature /* 'shorts' | 'recs' */) {
-  const isShorts = feature === "shorts";
-  const featureName = isShorts ? "Block Shorts" : "Block Recommendations";
+function handleTurnOff(feature /* 'yt' | 'shorts' | 'recs' */) {
+  const featureNames = {
+    yt: "Nuke YouTube",
+    shorts: "Nuke Shorts",
+    recs: "Nuke Recommendations",
+  };
+  const featureName = featureNames[feature];
+
+  const modeMap = {
+    yt: MODE.VERIFY_DISABLE_YT,
+    shorts: MODE.VERIFY_DISABLE_SHORTS,
+    recs: MODE.VERIFY_DISABLE_RECS,
+  };
 
   if (!state.pinHash) {
-    // No PIN exists yet → force the user to create one first
     pendingDisable = feature;
     openModal(
       MODE.SET_NEW_PIN,
@@ -283,7 +308,7 @@ function handleTurnOff(feature /* 'shorts' | 'recs' */) {
     );
   } else {
     openModal(
-      isShorts ? MODE.VERIFY_DISABLE_SHORTS : MODE.VERIFY_DISABLE_RECS,
+      modeMap[feature],
       "Enter PIN",
       `Enter your PIN to disable ${featureName}`,
     );
@@ -297,15 +322,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadState();
   renderMain();
 
+  /* ── YouTube toggle ── */
+  document.getElementById("yt-toggle").addEventListener("change", (e) => {
+    if (e.target.checked) {
+      state.ytBlocked = true;
+      persist();
+      renderMain();
+    } else {
+      e.target.checked = true;
+      handleTurnOff("yt");
+    }
+  });
+
   /* ── Shorts toggle ── */
   document.getElementById("shorts-toggle").addEventListener("change", (e) => {
     if (e.target.checked) {
-      // Turning ON is always free
       state.shortsBlocked = true;
       persist();
       renderMain();
     } else {
-      // Revert the visual immediately; only update after PIN is confirmed
       e.target.checked = true;
       handleTurnOff("shorts");
     }
@@ -326,7 +361,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   /* ── PIN action button (Set PIN / Change PIN) ── */
   document.getElementById("pin-action-btn").addEventListener("click", () => {
     if (state.pinHash) {
-      // Already has PIN → verify current before allowing change
       openModal(
         MODE.VERIFY_CHANGE_PIN,
         "Change PIN",
@@ -345,7 +379,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   /* ── Cancel / back button ── */
   document.getElementById("modal-close").addEventListener("click", () => {
     closeModal();
-    renderMain(); // restore any visually-reverted toggles
+    renderMain();
   });
 
   /* ── Numpad digit buttons ── */
@@ -360,7 +394,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   /* ── Keyboard support ── */
   document.addEventListener("keydown", (e) => {
-    // Only active when the overlay is visible
     if (document.getElementById("pin-view").classList.contains("hidden"))
       return;
 

@@ -3,26 +3,41 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Nuke Shorts</title>
+        <title>NukeYT</title>
         <link rel="stylesheet" href="popup.css" />
     </head>
     <body>
         <div class="app">
             <!-- ── Header (always visible) ── -->
             <header class="header">
-                <span class="header-title">Nuke Shorts</span>
+                <span class="header-title">NukeYT</span>
             </header>
 
             <!-- ── Main view ── -->
             <div class="view" id="main-view">
                 <div class="feature-row">
                     <div class="feature-text">
-                        <div class="feature-name">Block Shorts</div>
+                        <div class="feature-name">Nuke YouTube</div>
+                        <div class="feature-desc">Block YouTube entirely</div>
+                    </div>
+                    <label class="toggle" aria-label="Toggle Nuke YouTube">
+                        <input type="checkbox" id="yt-toggle" />
+                        <span class="toggle-track">
+                            <span class="toggle-thumb"></span>
+                        </span>
+                    </label>
+                </div>
+
+                <div class="row-divider"></div>
+
+                <div class="feature-row">
+                    <div class="feature-text">
+                        <div class="feature-name">Nuke Shorts</div>
                         <div class="feature-desc">
                             Hide all YouTube Shorts &amp; redirects
                         </div>
                     </div>
-                    <label class="toggle" aria-label="Toggle Block Shorts">
+                    <label class="toggle" aria-label="Toggle Nuke Shorts">
                         <input type="checkbox" id="shorts-toggle" />
                         <span class="toggle-track">
                             <span class="toggle-thumb"></span>
@@ -34,14 +49,14 @@
 
                 <div class="feature-row">
                     <div class="feature-text">
-                        <div class="feature-name">Block Recommendations</div>
+                        <div class="feature-name">Nuke Recommendations</div>
                         <div class="feature-desc">
                             Hide sidebar &amp; end-screen suggestions
                         </div>
                     </div>
                     <label
                         class="toggle"
-                        aria-label="Toggle Block Recommendations"
+                        aria-label="Toggle Nuke Recommendations"
                     >
                         <input type="checkbox" id="recs-toggle" />
                         <span class="toggle-track">

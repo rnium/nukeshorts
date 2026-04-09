@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Nuke Shorts",
-  "version": "1.1.0",
-  "description": "Strictly hides YouTube Shorts and watch-page recommended videos.",
+  "name": "NukeYT",
+  "version": "2.0.0",
+  "description": "Block YouTube Shorts, recommendations, or nuke YouTube entirely.",
   "icons": {
     "16": "icon16.png",
     "32": "icon32.png",
@@ -11,7 +11,7 @@
   },
   "permissions": ["storage"],
   "action": {
-    "default_title": "Nuke Shorts",
+    "default_title": "NukeYT",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icon16.png",
