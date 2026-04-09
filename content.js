@@ -112,12 +112,7 @@
       color: #a1a1aa;
       letter-spacing: 0.02em;
     }
-    #nukeyt-overlay .nukeyt-badge-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #ef4444;
-    }
+
   `;
 
   /* ─────────────────────────────────────────────
@@ -157,7 +152,6 @@
           Close this tab and do something awesome instead.
         </p>
         <div class="nukeyt-badge">
-          <span class="nukeyt-badge-dot"></span>
           Blocked by NukeYT
         </div>
       </div>
