@@ -8,7 +8,7 @@ A Chrome/Brave extension that can block YouTube Shorts, watch-page recommendatio
 - **Nuke Shorts** — hides all Shorts thumbnails, shelf sections, sidebar links, and redirects away from `/shorts/` URLs
 - **Nuke Recommendations** — hides the watch-page sidebar, end-screen suggestions, and autoplay overlays
 - **Popup UI** — click the extension icon to toggle each feature on or off
-- **PIN protection** — turning a feature *off* requires a 4-digit PIN; turning it back *on* is always free
+- **PIN protection** — turning a feature *off* requires a 6-digit PIN; turning it back *on* is always free
 - **Change PIN** — update your PIN at any time from the popup (requires the current PIN first)
 - **Live updates** — changes in the popup take effect on any open YouTube tab instantly, no refresh needed
 
@@ -35,7 +35,7 @@ Nuke Shorts and Nuke Recommendations are **on by default**. Nuke YouTube is **of
 
 ### PIN setup
 
-Turning a toggle **off** for the first time will prompt you to create a 4-digit PIN before the change is applied. After a PIN is set:
+Turning a toggle **off** for the first time will prompt you to create a 6-digit PIN before the change is applied. After a PIN is set:
 
 - **Turning off** any feature → enter your PIN on the numpad
 - **Turning on** any feature → no PIN needed

@@ -117,7 +117,7 @@ function closeModal() {
    Dot display
 ───────────────────────────────────────────── */
 function refreshDots() {
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 6; i++) {
     const dot = document.getElementById(`d${i}`);
     dot.classList.toggle("filled", i < pinBuffer.length);
     dot.classList.remove("error");
@@ -127,7 +127,7 @@ function refreshDots() {
 function flashDots(errorMsg) {
   const dotsEl = document.getElementById("pin-dots");
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 6; i++) {
     const d = document.getElementById(`d${i}`);
     d.classList.remove("filled");
     d.classList.add("error");
@@ -142,7 +142,7 @@ function flashDots(errorMsg) {
 
   setTimeout(() => {
     dotsEl.classList.remove("shake");
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 6; i++) {
       document.getElementById(`d${i}`).classList.remove("error");
     }
   }, 500);
@@ -167,11 +167,11 @@ function clearError() {
    Numpad input
 ───────────────────────────────────────────── */
 function pressDigit(digit) {
-  if (pinBuffer.length >= 4) return;
+  if (pinBuffer.length >= 6) return;
   clearError();
   pinBuffer += digit;
   refreshDots();
-  if (pinBuffer.length === 4) {
+  if (pinBuffer.length === 6) {
     setTimeout(handleComplete, 120);
   }
 }
@@ -236,7 +236,7 @@ async function handleComplete() {
   if (mode === MODE.VERIFY_CHANGE_PIN) {
     const hash = await sha256(entered);
     if (hash === state.pinHash) {
-      openModal(MODE.SET_NEW_PIN, "Set New PIN", "Enter your new 4-digit PIN");
+      openModal(MODE.SET_NEW_PIN, "Set New PIN", "Enter your new 6-digit PIN");
     } else {
       flashDots("Incorrect PIN. Try again.");
     }
@@ -274,7 +274,7 @@ async function handleComplete() {
         openModal(
           MODE.SET_NEW_PIN,
           "Set New PIN",
-          "Enter your new 4-digit PIN",
+          "Enter your new 6-digit PIN",
         );
       }, 900);
     }
@@ -371,7 +371,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       openModal(
         MODE.SET_NEW_PIN,
         "Set PIN",
-        "Create a 4-digit PIN to protect your settings",
+        "Create a 6-digit PIN to protect your settings",
       );
     }
   });
